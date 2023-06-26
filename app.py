@@ -1,3 +1,6 @@
+# pip install flask
+# pip install psycopg2
+
 import psycopg2
 import psycopg2.extras
 from flask import Flask, render_template, request, redirect, url_for
@@ -47,5 +50,5 @@ def work_page():
 if __name__ == "__main__":
     #app.host = '0.0.0.0'
     app.debug = True
-    app.run(host='0.0.0.0')
-    #app.run()
+    #app.run(host='0.0.0.0')
+    app.run()
