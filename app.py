@@ -1,3 +1,4 @@
+# Модули для установки:
 # pip install flask
 # pip install psycopg2
 
@@ -18,6 +19,7 @@ def sql_one(query):
     cur.execute(query)
     res = cur.fetchone()
     cur.close()
+    conn.commit()
     return res
 
 
