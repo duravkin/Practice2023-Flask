@@ -3,9 +3,14 @@
     <script>
     $(document).ready(function() {
         $('.GO').click(function () {
-            $.get('/test', {id: $('#number-ticket').val()}, function (data) {
-                alert(data);
-            });
+            $.get('/test',
+                {
+                    id: $('#number-ticket').val()
+                },
+                function (data) {
+                    alert(data);
+                }
+            );
         })
     })
     </script>
