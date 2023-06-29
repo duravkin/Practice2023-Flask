@@ -6,8 +6,9 @@ body {
 	font-family: Montserrat;
 	font-size: 16px;
 	font-weight: 400;
-	color: #000;
+	color: #fff;
 	min-width: 320px;
+	background-color: royalblue;
 }
 
 img {
@@ -16,7 +17,8 @@ img {
 }
 
 a {
-	color: #f7f7f7;
+	color: #111;
+	font-size: 14px;
 }
 
 a:hover {
@@ -24,7 +26,7 @@ a:hover {
 }
 
 .nabvar-light .navbar-nav .nav-link {
-	color: #f7f7f7;
+	color: #111;
 	font-weight: 500;
 	text-transform: uppercase;
 }
@@ -38,7 +40,7 @@ a:hover {
 	content: '';
 	display: block;
 	width: 100%;
-	background-color: #f7f7f7;
+	background-color: #111;
 	height: 1px;
 	transition: all .3s;
 	transform: scale(0);
@@ -49,5 +51,45 @@ a:hover {
 }
 
 i {
-	margin-left: 8px;
+	margin-right: 8px;
+}
+
+.modal {
+	color: #000;
+}
+
+.table {
+	width: 100%;
+	border: none;
+	border-collapse: separate;
+}
+.table thead th {
+	font-weight: bold;
+	text-align: center;
+	border: none;
+	background: #EDEDED;
+	font-size: 14px;
+	border-top: 1px solid #ddd;
+}
+.table thead tr th:first-child {
+	border-radius: 17px 0 0 0;
+}
+.table thead tr th:last-child {
+	border-radius: 0 17px 0 0;
+}
+.table tbody td {
+	text-align: center;
+	border: none;
+	padding: 10px 15px;
+	font-size: 14px;
+	vertical-align: top;
+}
+.table tbody tr:nth-child(even) {
+	background: #F8F8F8;
+}
+.table tbody tr:last-child td:first-child {
+	border-radius: 0 0 0 17px;
+}
+.table tbody tr:last-child td:last-child {
+	border-radius: 0 0 17px 0;
 }

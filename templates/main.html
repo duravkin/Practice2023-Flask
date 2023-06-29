@@ -1,19 +1,26 @@
-{% extends "bases/navbar.html" %}
+{% extends "bases/base.html" %}
 {% block start %}
-    <p>Количество пропусков всего: {{ out.count_pass }}</p>
-    <p>Количество записей в журнале: {{ out.count_logs }}</p>
-    <hr>
-    <form action="{{url_for('start_page')}}" method="POST">
-        <input type="text" name="id" placeholder="Номер удостоверения" value="{{ old_id if res }}">
-        <input type="submit" value="Проверить">
-    </form>
-    {% if res %}
-        {% if out2 != None %}
-            <p>Номер пропуска: {{out2.id_pass}}</p>
-            <p>Начало действия: {{out2.start_date}}</p>
-            <p>Конец действия: {{out2.end_date}}</p>
-        {% else %}
-            <p>Не найден пропуск!</p>
+    <div class="container">
+      <div class="d-flex justify-content-center mt-5">
+        <div class="col-md-8 col-sm-12 text-center">
+          <p>Количество пропусков всего: {{ out.count_pass }}</p>
+          <p>Количество записей в журнале: {{ out.count_logs }}</p>
+
+        <hr>
+        <form action="{{url_for('start_page')}}" method="POST">
+            <input type="text" name="id" placeholder="Номер удостоверения" value="{{ old_id if res }}">
+            <button type="submit" class="btn btn-light btn-sm">Проверить</button>
+        </form>
+        {% if res %}
+            {% if out2 != None %}
+                <p>Номер пропуска: {{out2.id_pass}}</p>
+                <p>Начало действия: {{out2.start_date}}</p>
+                <p>Конец действия: {{out2.end_date}}</p>
+            {% else %}
+                <p>Не найден пропуск!</p>
+            {% endif %}
         {% endif %}
-    {% endif %}
+        </div>
+      </div>
+    </div>
 {% endblock %}

@@ -1,6 +1,7 @@
 # Модули для установки:
 # pip install flask
 # pip install psycopg2
+# pip install asgiref
 
 import psycopg2
 import psycopg2.extras
@@ -48,6 +49,15 @@ def start_page():
 def work_page():
     return render_template("work.html")
 
+
+@app.route("/journal")
+def journal_page():
+    return render_template("journal.html")
+
+@app.route("/test",  methods=['GET'])
+async def test():
+    pass_id = request.args.get('id')
+    return pass_id
 
 if __name__ == "__main__":
     #app.host = '0.0.0.0'
