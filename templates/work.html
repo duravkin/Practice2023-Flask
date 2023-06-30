@@ -1,54 +1,45 @@
 {% extends "bases/base.html" %}
 {% block start %}
-    <script>
-    $(document).ready(function() {
-        $('.GO').click(function () {
-            $.get('/test',
-                {
-                    id: $('#number-ticket').val()
-                },
-                function (data) {
-                    alert(data);
-                }
-            );
-        })
-    })
-    </script>
 
     <div class="container">
       <div class="d-flex justify-content-center mt-5">
-        <form>
+        <form action="{{ url_for('new_log') }}" method="POST">
           <div class="d-flex justify-content-center">
             <label for="number-ticket" class="form-label">Номер пропуска</label>
           </div>
           <div>
-            <input type="text" class="form-control" id="number-ticket">
+            <input type="text" class="form-control" id="number-ticket" name="id">
           </div>
           <div class="d-flex justify-content-between mt-3">
-            <button type="button" class="btn btn-light btn-sm col-4 GO">Вход</button>
-            <button type="button" class="btn btn-light btn-sm col-4 GO">Выход</button>
-          </div>
-          <div class="d-flex justify-content-center mt-3">
-            <button type="button" class="btn btn-light btn-sm col-9" data-bs-toggle="modal" data-bs-target="#modal-result">Результат</button>
-
-              <div class="modal fade" id="modal-result" tabindex="-1" aria-labelledby="exampleModalLabel1" aria-hidden="true">
-                <div class="modal-dialog">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title">Проверка посещения</h5>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
-                    </div>
-                    <div class="modal-body">
-                      <p>Вы пришли на занятия вовремя!</p>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Закрыть</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <button class="btn btn-light btn-sm col-4" name="btn" value="TRUE">Вход</button>
+              <button class="btn btn-light btn-sm col-4" name="btn" value="FALSE">Выход</button>
           </div>
         </form>
       </div>
     </div>
+
+
+    <!--Тут можно как-то улучшить внешний вид таблицы -->
+<div class="container">
+    <br>
+<p class="h3 text-center">Последние события:</p>
+    <table class="table">
+        <tr>
+            <th>Номер записи</th>
+            <th>Тип события</th>
+            <th>Номер пропуска</th>
+            <th>Время события</th>
+            <th>Время опоздания</th>
+        </tr>
+        {% for log in logs %}
+            <tr>
+                <td>{{ log.id_log }}</td>
+                <td>{{ log.inside_status }}</td>
+                <td>{{ log.pass_id }}</td>
+                <td>{{ log.log_time }}</td>
+                <td>{{ log.delay_time }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
 {% endblock %}
