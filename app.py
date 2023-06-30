@@ -12,8 +12,6 @@ app = Flask(__name__, static_folder="static")
 
 conn = psycopg2.connect(host="localhost", database="practice1", user="postgres", password="admin")
 
-# conn.commit() - Использование данной конструкции поможет сохранять изменения в БД.
-
 
 def sql_one(query):
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -40,7 +38,7 @@ def sql(query):
 
 @app.route("/",  methods=["GET", "POST"])
 def start_page():
-    out = sql_one("select count(id_pass) as count_pass, count(id_log) as count_logs from passes, logs")
+    out = sql_one("select count(distinct id_pass) as count_pass, count(id_log) as count_logs from passes, logs")
     if request.method == "POST":
         id_pass = request.form["id"]
         if id_pass.isdigit():
@@ -61,14 +59,17 @@ def work_page():
 def journal_page():
     return render_template("journal.html")
 
+
 @app.route("/new_log",  methods=["POST"])
 def new_log():
     if request.method == "POST":
         status = request.form["btn"]
         id_pass = request.form["id"]
-        sql(f"insert into logs (inside_status, pass_id) values ({status}, {id_pass})")
+        if sql_one(f"select id_pass from passes where id_pass = {id_pass}") != None:
+            sql(f"insert into logs (inside_status, pass_id) values ({status}, {id_pass})")
+        else:
+            pass # https://habr.com/ru/companies/otus/articles/692820/
         return redirect(url_for("work_page"))
-
 
 
 if __name__ == "__main__":
