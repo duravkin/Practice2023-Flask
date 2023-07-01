@@ -1,24 +1,27 @@
 {% extends "bases/base.html" %}
 {% block start %}
-<div class="container">
-    <div class="d-flex justify-content-center mt-5 gap-2">
 
-                                               <!--Сортировака-->
+    <div class="container">
+      <div class="d-flex justify-content-center mt-5 gap-2">
+
+                                                                          <!--Сортировка-->
 
         <div class="dropdown">
-          <a class="btn btn-sm btn-light dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
-          Сортировать по:
-          </a>
+          <a class="btn btn-sm btn-light dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-arrow-right-arrow-left fa-rotate-90 fa-lg" style="color: #000000;"></i>Сортировать по:</a>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item active" href="#" aria-current="true">По времени входа</a></li>
-            <li><a class="dropdown-item" href="#">По времени опоздания</a></li>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" checked>
+              <label class="form-check-label" for="flexRadioDefault1">По времени входа</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
+              <label class="form-check-label" for="flexRadioDefault2">По времени опоздания</label>
+            </div>
           </ul>
         </div>
-                                                 <!--Фильтры-->
+                                                                             <!--Фильтры-->
 
-        <button class="btn btn-light btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
-          Фильтры
-        </button>
+        <button class="btn btn-light btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample"><i class="fa-solid fa-sliders fa-lg" style="color: #000000;"></i>Фильтры</button>
 
         <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
           <div class="offcanvas-header">
@@ -30,14 +33,12 @@
               <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
               <label class="form-check-label" for="flexCheckDefault">Списки опоздавших или нет</label>
             </div>
-            <div class="form-check">
-              <a class="btn" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                <label class="form-check-label" for="flexCheckChecked">Должность</label>
+            <div>
+              <a class="btn" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="true" aria-controls="collapseExample">Должность
               </a>
               <div class="collapse" id="collapseExample">
                 <div class="card card-body">
-                  <ul class="list-group-sm">
+                  <ul class="list-group-xs">
                     <li class="list-group-item">
                       <input class="form-check-input me-1" type="checkbox" value="" id="firstCheckbox">
                       <label class="form-check-label stretched-link" for="firstCheckbox">Студент</label>
@@ -56,9 +57,9 @@
             </div>
             <div class="mt-3">
               <button type="button" class="btn btn-primary btn-sm">Подтвердить</button>
-              <button type="button" class="btn btn-secondary btn-sm">Сбросить</button>
+              <button type="button" class="btn btn-secondary btn-sm">Сбросить</button>  
             </div>
-
+            
           </div>
         </div>
 
@@ -68,7 +69,7 @@
     <div class="container">
       <div class="d-flex justify-content-center mt-2">
 
-                                                 <!--Выбор дня-->
+                                                                           <!--Выбор дня-->
 
         <a class="nav-link"aria-current="page" href="#" data-bs-toggle="modal" data-bs-target="#modal-admin"><i class="fa-solid fa-calendar-days fa-xl" style="color: #ffffff;" title="Календарь"></i></a>
           <div class="modal fade" id="modal-admin" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -90,26 +91,30 @@
                     </div>
                   </div>
             </div>
-              <div class="btn-group btn-group-sm" role="group" aria-label="Базовая группа переключателей радио">
 
-                <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
-                <label class="btn btn-outline-light" for="btnradio1">-3</label>
+            <div class="btn-group btn-group-sm" role="group" aria-label="Базовая группа переключателей радио">
 
-                <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" checked>
-                <label class="btn btn-outline-light" for="btnradio2">-2</label>
+              <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
+              <label class="btn btn-outline-light" for="btnradio1">-3</label>
 
-                <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off" checked>
-                <label class="btn btn-outline-light" for="btnradio3">-1</label>
+              <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" checked>
+              <label class="btn btn-outline-light" for="btnradio2">-2</label>
 
-                <input type="radio" class="btn-check" name="btnradio" id="btnradio4" autocomplete="off">
-                <label class="btn btn-outline-light" for="btnradio4">Вчера</label>
+              <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off" checked>
+              <label class="btn btn-outline-light" for="btnradio3">-1</label>
 
-                <input type="radio" class="btn-check" name="btnradio" id="btnradio5" autocomplete="off" checked>
-                <label class="btn btn-outline-light" for="btnradio5">Сегодня</label>
+              <input type="radio" class="btn-check" name="btnradio" id="btnradio4" autocomplete="off">
+              <label class="btn btn-outline-light" for="btnradio4">Вчера</label>
 
-              </div>
+              <input type="radio" class="btn-check" name="btnradio" id="btnradio5" autocomplete="off" checked>
+              <label class="btn btn-outline-light" for="btnradio5">Сегодня</label>
+
+            </div>
+
       </div>
     </div>
+
+                                                                            <!--Таблица-->
 
     <div class="container">
       <div class="d-flex justify-content-center mt-2">
@@ -171,4 +176,5 @@
 
       </div>
     </div>
+
 {% endblock %}

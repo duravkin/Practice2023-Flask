@@ -32,13 +32,13 @@
             <th>Время опоздания</th>
         </tr>
         {% for log in logs %}
-            <tr>
-                <td>{{ log.id_log }}</td>
-                <td>{{ log.inside_status }}</td>
-                <td>{{ log.pass_id }}</td>
-                <td>{{ log.log_time }}</td>
-                <td>{{ log.delay_time }}</td>
-            </tr>
+        <tr>
+            <td>{{ log.id_log }}</td>
+            <td>{{ log.inside_status }}</td>
+            <td>{{ log.pass_id }}</td>
+            <td>{{ log.log_time }}</td>
+            <td>{{ log.delay_time }}</td>
+        </tr>
         {% endfor %}
     </table>
 </div>

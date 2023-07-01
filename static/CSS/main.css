@@ -3,12 +3,16 @@ html {
 }
 
 body {
-	font-family: Montserrat;
+	font-family: 'Montserrat', medium;
 	font-size: 16px;
 	font-weight: 400;
 	color: #fff;
 	min-width: 320px;
-	background-color: royalblue;
+	background-color: #cfc9c9;
+}
+
+label {
+	font-size: 14px;
 }
 
 img {
