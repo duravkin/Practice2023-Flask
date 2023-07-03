@@ -50,24 +50,37 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <div class="modal-body">
-                        <form action="">
+
+                            <!-- Тут сообщения о некорректном вводе появятся -->
+                          {% with messages = get_flashed_messages() %}
+                          {% if messages %}
+                            <ul class=flashes>
+                            {% for message in messages %}
+                              <li>{{ message }}</li>
+                            {% endfor %}
+                            </ul>
+                          {% endif %}
+                        {% endwith %}
+
+                        <form action="{{ url_for('user_login') }}" method="POST">
                           <div class="row mb-3">
-                            <label for="inputEmail" class="col-sm-2 col-form-label">Почта</label>
+                            <label for="inputLogin" class="col-sm-2 col-form-label">Логин</label>
                             <div class="col-sm-10">
-                              <input type="email" class="form-control" id="inputEmail">
+                              <input type="text" class="form-control" id="inputLogin" name="inputLogin">
                             </div>
                           </div>
                           <div class="row mb-3">
                             <label for="inputPass" class="col-sm-2 col-form-label">Пароль</label>
                             <div class="col-sm-10">
-                              <input type="password" class="form-control" id="inputPass">
+                              <input type="password" class="form-control" id="inputPass" name="inputPass">
                             </div>
                           </div>
+
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                            <button type="submit" class="btn btn-primary">Подтвердить</button>
+                          </div>
                         </form>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                        <button type="button" class="btn btn-primary">Подтвердить</button>
                       </div>
                     </div>
                   </div>
@@ -75,7 +88,7 @@
 
             </li>
             <li class="nav-item">
-              <a class="nav-link" aria-current="page" href="#"><i class="fa-solid fa-door-open" title="Выход"></i></a>
+              <a class="nav-link" aria-current="page" href="{{ url_for('user_logout') }}"><i class="fa-solid fa-door-open" title="Выход"></i></a>
             </li>
           </ul>
         </div>

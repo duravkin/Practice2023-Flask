@@ -1,0 +1,14 @@
+{% extends "bases/base.html" %}
+{% block start %}
+
+    <form action="{{ url_for('register') }}" method="POST">
+        <input type="text" name="login" placeholder="Логин">
+        <br>
+        <input type="password" name="password" placeholder="Пароль">
+        <br>
+        <input type="password" name="password2" placeholder="Повторите пароль">
+        <br>
+        <input type="submit" value="Добавить">
+    </form>
+
+{% endblock %}

@@ -1,11 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
-
+from werkzeug.security import check_password_hash, generate_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
 
+
 app = Flask(__name__, static_folder="static")
-app.secret_key = 'some secret salt'
+app.secret_key = '([супер секретная фраза, которую никто не сможет отгадать])'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:admin@localhost/practice2'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -70,6 +71,9 @@ class Admin(db.Model, UserMixin):
     login = db.Column(db.String(32), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
 
+    def get_id(self):
+        return (self.id_admin)
+
 
 class Log(db.Model):
     __tablename__ = 'logs'
@@ -78,9 +82,6 @@ class Log(db.Model):
     pass_id = db.Column(db.Integer, db.ForeignKey('passes.id_pass', ondelete='CASCADE'), nullable=False)
     log_time = db.Column(db.TIMESTAMP, nullable=False, server_default=db.func.current_timestamp())
     delay_time = db.Column(db.Time)
-
-
-# db.create_all()
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -94,21 +95,67 @@ def start_page():
             pass_info = Pass.query.filter(Pass.id_pass == id_pass).first()
         else:
             pass_info = None
-        return render_template("main.html", out=result, res=True, out2=pass_info, old_id=id_pass)
-    return render_template("main.html", out=result, res=False)
+        return render_template("index.html", out=result, res=True, out2=pass_info, old_id=id_pass)
+    return render_template("index.html", out=result, res=False)
 
 
 @app.route("/login", methods=["POST"])
-def user_login():
+async def user_login():
     if request.method == "POST":
-        login = request.form["login"]
-        password = request.form["pass"]
-        login_user(Admin)
+        login = request.form["inputLogin"]
+        password = request.form["inputPass"]
 
-        return redirect(url_for("work_page"))
+        if login and password:
+            admin = Admin.query.filter_by(login=login).first()
+            if admin and check_password_hash(admin.password, password):
+                login_user(admin)
+                return redirect(url_for("work_page"))
+            else:
+                flash('Неправильный логин или пароль!')
+        else:
+            flash('Пожалуйста, заполните все поля!')
+    return redirect(url_for('start_page'))
+
+
+@app.route("/logout")
+@login_required
+def user_logout():
+    logout_user()
+    return redirect(url_for("start_page"))
+
+
+@app.route('/admin_page')
+# @login_required
+def admin_page():
+    return render_template('add_admin.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+# @login_required
+def register():
+    login = request.form.get('login')
+    password = request.form.get('password')
+    password2 = request.form.get('password2')
+
+    if request.method == 'POST':
+        if not (login or password or password2):
+            flash('Please, fill all fields!')
+        elif password != password2:
+            flash('Passwords are not equal!')
+        else:
+            hash_pwd = generate_password_hash(password)
+            new_user = Admin()
+            new_user.login = login
+            new_user.password = hash_pwd
+            db.session.add(new_user)
+            db.session.commit()
+
+            return redirect(url_for('start_page'))
+
+    return render_template('register.html')
 
 
 @app.route("/work")
+@login_required
 def work_page():
     result = Log.query.order_by(Log.id_log.desc()).limit(3).all()
 
@@ -116,6 +163,7 @@ def work_page():
 
 
 @app.route("/journal")
+@login_required
 def journal_page():
     query = text("SELECT * FROM journal_view")
     result = db.session.execute(query)
@@ -123,6 +171,7 @@ def journal_page():
 
 
 @app.route("/new_log", methods=["POST"])
+@login_required
 def new_log():
     if request.method == "POST":
         status = request.form["btn"]
@@ -137,6 +186,7 @@ def new_log():
 
 
 @app.route("/delete_log/<int:id>")
+@login_required
 def delete_log(id):
     print(id)
     return redirect(url_for("journal_page"))
