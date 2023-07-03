@@ -132,15 +132,17 @@ def admin_page():
 @app.route('/register', methods=['GET', 'POST'])
 # @login_required
 def register():
-    login = request.form.get('login')
-    password = request.form.get('password')
-    password2 = request.form.get('password2')
+    if request.method == "POST":
+        login = request.form['login']
+        password = request.form['password']
+        password2 = request.form['password2']
 
-    if request.method == 'POST':
-        if not (login or password or password2):
-            flash('Please, fill all fields!')
+        if login.strip() == '':
+            flash('Заполните поле "Логин"!')
+        elif password.strip() == '' or password2.strip() == '':
+            flash('Заполните поле "Пароль"!')
         elif password != password2:
-            flash('Passwords are not equal!')
+            flash('Пароль не совпадают!')
         else:
             hash_pwd = generate_password_hash(password)
             new_user = Admin()
@@ -151,7 +153,7 @@ def register():
 
             return redirect(url_for('start_page'))
 
-    return render_template('register.html')
+    return redirect(url_for('admin_page'))
 
 
 @app.route("/work")

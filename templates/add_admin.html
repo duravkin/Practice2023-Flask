@@ -1,6 +1,17 @@
 {% extends "bases/base.html" %}
 {% block start %}
 
+      <!-- Тут сообщения о некорректном вводе появятся -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class=flashes>
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
     <form action="{{ url_for('register') }}" method="POST">
         <input type="text" name="login" placeholder="Логин">
         <br>
