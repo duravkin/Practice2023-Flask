@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, g, jsonify
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
+from flask_admin import Admin as F_Admin
+from flask_admin.contrib.sqla import ModelView
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
 
@@ -11,6 +13,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:admin@localhost/p
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 manager = LoginManager(app)
+
+
+# ======== Модели БД ========
 
 
 class Weekday(db.Model):
@@ -82,6 +87,65 @@ class Log(db.Model):
     pass_id = db.Column(db.Integer, db.ForeignKey('passes.id_pass', ondelete='CASCADE'), nullable=False)
     log_time = db.Column(db.TIMESTAMP, nullable=False, server_default=db.func.current_timestamp())
     delay_time = db.Column(db.Time)
+
+
+# ======== Админка ========
+
+
+admin = F_Admin(app, name='pass control', template_mode='bootstrap3')
+
+
+class WeekdayView(ModelView):
+    column_list = ['weekday']
+    form_columns = ['weekday']
+
+
+class ScheduleView(ModelView):
+    column_list = ['weekday_id', 'start_time_day', 'end_time_day']
+    form_columns = ['weekday_id', 'start_time_day', 'end_time_day']
+
+
+class JobView(ModelView):
+    column_list = ['job']
+    form_columns = ['job']
+
+
+class StudentGroupView(ModelView):
+    column_list = ['group_name']
+    form_columns = ['group_name']
+
+
+class ScheduleJobView(ModelView):
+    column_list = ['schedule_id', 'job_id', 'group_id']
+    form_columns = ['schedule_id', 'job_id', 'group_id']
+
+
+class PersonView(ModelView):
+    column_list = ['surname', 'firstname', 'patronymic', 'job_id', 'group_id']
+    form_columns = ['surname', 'firstname', 'patronymic', 'job_id', 'group_id']
+
+
+class PassView(ModelView):
+    column_list = ['person_id', 'start_date', 'end_date']
+    form_columns = ['person_id', 'start_date', 'end_date']
+
+
+class LogView(ModelView):
+    column_list = ['inside_status', 'pass_id', 'log_time', 'delay_time']
+    form_columns = ['inside_status', 'pass_id', 'log_time', 'delay_time']
+
+
+admin.add_view(WeekdayView(Weekday, db.session))
+admin.add_view(ScheduleView(Schedule, db.session))
+admin.add_view(JobView(Job, db.session))
+admin.add_view(StudentGroupView(StudentGroup, db.session))
+admin.add_view(ScheduleJobView(ScheduleJob, db.session))
+admin.add_view(PersonView(Person, db.session))
+admin.add_view(PassView(Pass, db.session))
+admin.add_view(LogView(Log, db.session))
+
+
+# ======== Роуты ========
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -190,8 +254,6 @@ async def journal_table_generate():
         return jsonify({'html': table_html})
 
 
-
-
 @app.route("/new_log", methods=["POST"])
 @login_required
 def new_log():
@@ -199,7 +261,10 @@ def new_log():
         status = request.form["btn"]
         id_pass = request.form["id"]
         if db.session.query(Pass.id_pass).filter(Pass.id_pass == id_pass).scalar() is not None:
-            log = Log(inside_status=status, pass_id=id_pass)
+            log = Log(
+                inside_status=bool(status),
+                pass_id=id_pass
+            )
             db.session.add(log)
             db.session.commit()
         else:
