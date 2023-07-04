@@ -38,6 +38,7 @@
 
           <!--Авторизация и вход-->
           <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          {% if not g.user.is_authenticated %}
             <li class="nav-item">
               <a class="nav-link" aria-current="page" href="#" data-bs-toggle="modal" data-bs-target="#modal-admin"><i class="fa-solid fa-user" title="Войти как администратор"></i></a>
 
@@ -87,9 +88,14 @@
                 </div>
 
             </li>
-            <li class="nav-item">
-              <a class="nav-link" aria-current="page" href="{{ url_for('user_logout') }}"><i class="fa-solid fa-door-open" title="Выход"></i></a>
-            </li>
+          {% else %}
+              <li class="nav-item">
+                  <a href="{{ url_for('admin_page') }}" class="nav-link">Админ № {{ g.user.get_id() }}</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="{{ url_for('user_logout') }}"><i class="fa-solid fa-door-open" title="Выход"></i></a>
+              </li>
+          {% endif %}
           </ul>
         </div>
       </div>

@@ -1,5 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
+from flask import Flask, render_template, request, redirect, url_for, flash, g
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
@@ -99,6 +99,11 @@ def start_page():
     return render_template("index.html", out=result, res=False)
 
 
+@app.before_request
+def before_request():
+    g.user = current_user
+
+
 @app.route("/login", methods=["POST"])
 async def user_login():
     if request.method == "POST":
@@ -128,6 +133,7 @@ def user_logout():
 # @login_required
 def admin_page():
     return render_template('add_admin.html')
+
 
 @app.route('/register', methods=['GET', 'POST'])
 # @login_required
