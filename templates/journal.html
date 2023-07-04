@@ -71,7 +71,22 @@
 
                                                                            <!--Выбор дня-->
 
-        <a class="nav-link"aria-current="page" href="#" data-bs-toggle="modal" data-bs-target="#modal-admin"><i class="fa-solid fa-calendar-days fa-xl" style="color: #ffffff;" title="Календарь"></i></a>
+          <script>
+              $(document).ready(function() {
+                $('input[name="btnradio"]').change(function() {
+                  var selectedValue = $('input[name="btnradio"]:checked').val();
+
+                  $.get("{{ url_for('journal_table_generate') }}", { rb_day: selectedValue })
+                    .done(function(response) {
+                        $('#table-container').html(response.html);
+                    })
+                    .fail(function(xhr, status, error) {
+                        console.error(error);
+                    });
+                });
+              });
+          </script>
+        <a class="nav-link" aria-current="page" href="#" data-bs-toggle="modal" data-bs-target="#modal-admin"><i class="fa-solid fa-calendar-days fa-xl" style="color: #ffffff;" title="Календарь"></i></a>
           <div class="modal fade" id="modal-admin" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                   <div class="modal-dialog">
                     <div class="modal-content">
@@ -79,34 +94,34 @@
                         <h1 class="modal-title fs-5" id="exampleModalLabel">Выберите день и время</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
-                      <div class="modal-body">
                         <form>
-                          <input type="datetime-local" class="form-control">
+                          <div class="modal-body">
+                              <input type="datetime-local" class="form-control">
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                            <button type="button" class="btn btn-primary">Подтвердить</button>
+                          </div>
                         </form>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                        <button type="button" class="btn btn-primary">Подтвердить</button>
-                      </div>
                     </div>
                   </div>
             </div>
 
             <div class="btn-group btn-group-sm" role="group" aria-label="Базовая группа переключателей радио">
 
-              <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
+              <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" value="4">
               <label class="btn btn-outline-light" for="btnradio1">-3</label>
 
-              <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" checked>
+              <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" value="3">
               <label class="btn btn-outline-light" for="btnradio2">-2</label>
 
-              <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off" checked>
+              <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off" value="2">
               <label class="btn btn-outline-light" for="btnradio3">-1</label>
 
-              <input type="radio" class="btn-check" name="btnradio" id="btnradio4" autocomplete="off">
+              <input type="radio" class="btn-check" name="btnradio" id="btnradio4" autocomplete="off" value="1">
               <label class="btn btn-outline-light" for="btnradio4">Вчера</label>
 
-              <input type="radio" class="btn-check" name="btnradio" id="btnradio5" autocomplete="off" checked>
+              <input type="radio" class="btn-check" name="btnradio" id="btnradio5" autocomplete="off" value="0" checked>
               <label class="btn btn-outline-light" for="btnradio5">Сегодня</label>
 
             </div>
@@ -117,42 +132,8 @@
                                                                             <!--Таблица-->
 
     <div class="container">
-      <div class="d-flex justify-content-center mt-2">
-        <table class="table">
-          <thead>
-            <tr>
-              <th scope="col">Статус</th>
-              <th scope="col">ФИО</th>
-              <th scope="col">Номер удостоверения</th>
-              <th colspan="2" scope="col">Должность (и группа)</th>
-              <th scope="col">Расписание</th>
-              <th scope="col">Время действия</th>
-              <th scope="col">Редактировать</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for j in jurnal %}
-            <tr>
-                <td class="col-1">{{ j.inside_status }}</td>
-                <td class="col-2">{{ j.surname + ' ' + j.firstname}}</td>
-                <td class="col-1">{{ j.pass_id }}</td>
-                {% if j.group_name != None %}
-                    <td class="col-1">{{ j.job }}</td>
-                    <td class="col-1">{{ j.group_name }}</td>
-                {% else %}
-                    <td colspan="2" class="col-2">{{ j.job }}</td>
-                {% endif %}
-                <td class="col-2">{{ j.start_time_day, j.end_time_day }}</td>
-                <td class="col-1">{{ j.log_time }}</td>
-                <td>
-                <button type="button" class="btn btn-primary btn-sm">Редактировать</button>
-                <a href="/delete_log/0" class="btn btn-danger btn-sm">Удалить</a>
-              </td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-
+      <div class="d-flex justify-content-center mt-2" id="table-container">
+        {{ content|safe }}
       </div>
     </div>
 

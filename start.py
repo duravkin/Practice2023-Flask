@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, g
+from flask import Flask, render_template, request, redirect, url_for, flash, g, jsonify
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_sqlalchemy import SQLAlchemy
@@ -173,9 +173,23 @@ def work_page():
 @app.route("/journal")
 @login_required
 def journal_page():
-    query = text("SELECT * FROM journal_view")
+    query = text("SELECT * FROM journal_view where weekday_id = (select extract(dow from NOW()::timestamp))")
     result = db.session.execute(query)
-    return render_template("journal.html", jurnal=result)
+    table_html = render_template('journal_table.html', jurnal=result)
+    return render_template('journal.html', content=table_html)
+
+
+@app.route("/journal_table", methods=["GET"])
+async def journal_table_generate():
+    if request.method == "GET":
+        rb_day = request.args.get('rb_day')
+        query = text(f"SELECT * FROM journal_view where weekday_id = (select extract(dow from NOW()::timestamp) - {rb_day})")
+        result = db.session.execute(query)
+
+        table_html = render_template('journal_table.html', jurnal=result)
+        return jsonify({'html': table_html})
+
+
 
 
 @app.route("/new_log", methods=["POST"])
