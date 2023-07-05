@@ -18,12 +18,14 @@ manager = LoginManager(app)
 # ======== Модели БД ========
 
 
+# Определяем модель Weekday
 class Weekday(db.Model):
     __tablename__ = 'weekdays'
     id_weekday = db.Column(db.Integer, primary_key=True)
     weekday = db.Column(db.String(20), unique=True, nullable=False)
 
 
+# Определяем модель Schedule
 class Schedule(db.Model):
     __tablename__ = 'schedules'
     id_schedule = db.Column(db.Integer, primary_key=True)
@@ -31,27 +33,37 @@ class Schedule(db.Model):
     start_time_day = db.Column(db.Time, nullable=False)
     end_time_day = db.Column(db.Time, nullable=False)
 
+    weekday = db.relationship('Weekday', backref=db.backref('schedules', lazy=True))
 
+
+# Определяем модель Job
 class Job(db.Model):
     __tablename__ = 'jobs'
     id_job = db.Column(db.Integer, primary_key=True)
     job = db.Column(db.String(20), unique=True, nullable=False)
 
 
+# Определяем модель StudentGroup
 class StudentGroup(db.Model):
     __tablename__ = 'student_groups'
     id_group = db.Column(db.Integer, primary_key=True)
     group_name = db.Column(db.String(100), nullable=False)
 
 
+# Определяем модель ScheduleJob
 class ScheduleJob(db.Model):
     __tablename__ = 'schedule_jobs'
     id_schedule_job = db.Column(db.Integer, primary_key=True)
-    schedule_id = db.Column(db.Integer, db.ForeignKey('schedules.id_schedule', ondelete='CASCADE'), nullable=False)
-    job_id = db.Column(db.Integer, db.ForeignKey('jobs.id_job', ondelete='CASCADE'), nullable=False)
+    schedule_id = db.Column(db.Integer, db.ForeignKey('schedules.id_schedule'), nullable=False)
+    job_id = db.Column(db.Integer, db.ForeignKey('jobs.id_job'), nullable=False)
     group_id = db.Column(db.Integer, db.ForeignKey('student_groups.id_group'))
 
+    schedule = db.relationship('Schedule', backref=db.backref('schedule_jobs', lazy=True))
+    job = db.relationship('Job', backref=db.backref('schedule_jobs', lazy=True))
+    group = db.relationship('StudentGroup')
 
+
+# Определяем модель Person
 class Person(db.Model):
     __tablename__ = 'people'
     id_person = db.Column(db.Integer, primary_key=True)
@@ -61,7 +73,11 @@ class Person(db.Model):
     job_id = db.Column(db.Integer, db.ForeignKey('jobs.id_job'), nullable=False)
     group_id = db.Column(db.Integer, db.ForeignKey('student_groups.id_group'))
 
+    job = db.relationship('Job')
+    group = db.relationship('StudentGroup')
 
+
+# Определяем модель Pass
 class Pass(db.Model):
     __tablename__ = 'passes'
     id_pass = db.Column(db.Integer, primary_key=True)
@@ -69,7 +85,10 @@ class Pass(db.Model):
     start_date = db.Column(db.Date, nullable=False, server_default=db.func.current_date())
     end_date = db.Column(db.Date, nullable=False)
 
+    person = db.relationship('Person', backref=db.backref('passes', lazy=True))
 
+
+# Определяем модель Admin
 class Admin(db.Model, UserMixin):
     __tablename__ = 'admins'
     id_admin = db.Column(db.Integer, primary_key=True)
@@ -80,13 +99,16 @@ class Admin(db.Model, UserMixin):
         return (self.id_admin)
 
 
+# Определяем модель Log
 class Log(db.Model):
     __tablename__ = 'logs'
     id_log = db.Column(db.Integer, primary_key=True)
     inside_status = db.Column(db.Boolean, nullable=False)
-    pass_id = db.Column(db.Integer, db.ForeignKey('passes.id_pass', ondelete='CASCADE'), nullable=False)
-    log_time = db.Column(db.TIMESTAMP, nullable=False, server_default=db.func.current_timestamp())
+    pass_id = db.Column(db.Integer, db.ForeignKey('passes.id_pass'), nullable=False)
+    log_time = db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
     delay_time = db.Column(db.Time)
+
+    pass_ = db.relationship('Pass', backref=db.backref('logs', lazy=True))
 
 
 # ======== Админка ========
@@ -95,54 +117,63 @@ class Log(db.Model):
 admin = F_Admin(app, name='pass control', template_mode='bootstrap3')
 
 
-class WeekdayView(ModelView):
-    column_list = ['weekday']
-    form_columns = ['weekday']
-
-
+# Создаем класс представления для Schedule
 class ScheduleView(ModelView):
-    column_list = ['weekday_id', 'start_time_day', 'end_time_day']
-    form_columns = ['weekday_id', 'start_time_day', 'end_time_day']
+    column_list = ('id_schedule', 'weekday.weekday', 'start_time_day', 'end_time_day')
+    column_labels = {'id_schedule': 'Schedule ID', 'weekday.weekday': 'Weekday', 'start_time_day': 'Start Time', 'end_time_day': 'End Time'}
 
 
-class JobView(ModelView):
-    column_list = ['job']
-    form_columns = ['job']
-
-
-class StudentGroupView(ModelView):
-    column_list = ['group_name']
-    form_columns = ['group_name']
-
-
-class ScheduleJobView(ModelView):
-    column_list = ['schedule_id', 'job_id', 'group_id']
-    form_columns = ['schedule_id', 'job_id', 'group_id']
-
-
+# Создаем класс представления для Person
 class PersonView(ModelView):
-    column_list = ['surname', 'firstname', 'patronymic', 'job_id', 'group_id']
-    form_columns = ['surname', 'firstname', 'patronymic', 'job_id', 'group_id']
+    column_list = ('id_person', 'surname', 'firstname', 'patronymic', 'job.job', 'group.group_name')
+    column_labels = {'id_person': 'Person ID', 'surname': 'Surname', 'firstname': 'First Name', 'patronymic': 'Patronymic', 'job.job': 'Job', 'group.group_name': 'Group'}
 
 
+# Класс представления для Job
+class JobView(ModelView):
+    column_list = ('id_job', 'job')
+    column_labels = {'id_job': 'Job ID', 'job': 'Job'}
+
+
+# Класс представления для StudentGroup
+class StudentGroupView(ModelView):
+    column_list = ('id_group', 'group_name')
+    column_labels = {'id_group': 'Group ID', 'group_name': 'Group Name'}
+
+
+# Класс представления для ScheduleJob
+class ScheduleJobView(ModelView):
+    column_list = ('id_schedule_job', 'schedule.start_time_day', 'schedule.end_time_day', 'job.job', 'group.group_name')
+    column_labels = {'id_schedule_job': 'Schedule Job ID', 'schedule.start_time_day': 'Start Time', 'schedule.end_time_day': 'End Time', 'job.job': 'Job', 'group.group_name': 'Group'}
+
+
+# Класс представления для Pass
 class PassView(ModelView):
-    column_list = ['person_id', 'start_date', 'end_date']
-    form_columns = ['person_id', 'start_date', 'end_date']
+    column_list = ('id_pass', 'person.surname', 'person.firstname', 'start_date', 'end_date')
+    column_labels = {'id_pass': 'Pass ID', 'person.surname': 'Surname', 'person.firstname': 'First Name', 'start_date': 'Start Date', 'end_date': 'End Date'}
 
 
+# Класс представления для Admin
+class AdminView(ModelView):
+    column_list = ('id_admin', 'login')
+    column_labels = {'id_admin': 'Admin ID', 'login': 'Login'}
+
+
+# Класс представления для Log
 class LogView(ModelView):
-    column_list = ['inside_status', 'pass_id', 'log_time', 'delay_time']
-    form_columns = ['inside_status', 'pass_id', 'log_time', 'delay_time']
+    column_list = ('id_log', 'inside_status', 'pass.person.surname', 'pass.person.firstname', 'log_time', 'delay_time')
+    column_labels = {'id_log': 'Log ID', 'inside_status': 'Inside Status', 'pass.person.surname': 'Surname', 'pass.person.firstname': 'First Name', 'log_time': 'Log Time', 'delay_time': 'Delay Time'}
 
 
-admin.add_view(WeekdayView(Weekday, db.session))
+# После этого, замените добавление в админку для этих таблиц на новые классы представлений:
+admin.add_view(ModelView(Weekday, db.session))
 admin.add_view(ScheduleView(Schedule, db.session))
-admin.add_view(JobView(Job, db.session))
-admin.add_view(StudentGroupView(StudentGroup, db.session))
-admin.add_view(ScheduleJobView(ScheduleJob, db.session))
+admin.add_view(ModelView(Job, db.session))
+admin.add_view(ModelView(StudentGroup, db.session))
+admin.add_view(ModelView(ScheduleJob, db.session))
 admin.add_view(PersonView(Person, db.session))
-admin.add_view(PassView(Pass, db.session))
-admin.add_view(LogView(Log, db.session))
+admin.add_view(ModelView(Pass, db.session))
+admin.add_view(ModelView(Log, db.session))
 
 
 # ======== Роуты ========
@@ -262,7 +293,7 @@ def new_log():
         id_pass = request.form["id"]
         if db.session.query(Pass.id_pass).filter(Pass.id_pass == id_pass).scalar() is not None:
             log = Log(
-                inside_status=bool(status),
+                inside_status=bool(int(status)),
                 pass_id=id_pass
             )
             db.session.add(log)
@@ -277,6 +308,27 @@ def new_log():
 def delete_log(id):
     print(id)
     return redirect(url_for("journal_page"))
+
+
+@app.route("/stats", methods=["GET", "POST"])
+@login_required
+def stats_page():
+    if request.method == "POST":
+        id_pass = request.form["id"]
+        if id_pass.isdigit():
+            result = db.session.query(Person). \
+                join(Pass, Person.id_person == Pass.person_id). \
+                join(Job, Job.id_job == Person.job_id). \
+                outerjoin(StudentGroup, Person.group_id == StudentGroup.id_group). \
+                filter(Pass.id_pass == id_pass).first()
+            if result:
+                logs = Log.query.filter_by(pass_id=id_pass).all()
+                return render_template("stats.html", res=result, old=id_pass, logs=logs)
+            else:
+                flash("Не найдено!")
+        else:
+            flash("Некорректный ввод!")
+    return render_template("stats.html")
 
 
 @manager.user_loader
