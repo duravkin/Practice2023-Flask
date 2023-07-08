@@ -5,14 +5,14 @@
       <div class="d-flex justify-content-center mt-5">
         <form action="{{ url_for('new_log') }}" method="POST">
           <div class="d-flex justify-content-center">
-            <label for="number-ticket" class="form-label">Номер пропуска</label>
+            <label for="number-ticket" class="form-label"><h5>Номер пропуска</h5></label>
           </div>
           <div>
             <input type="text" class="form-control" id="number-ticket" name="id">
           </div>
           <div class="d-flex justify-content-between mt-3">
-              <button class="btn btn-light btn-sm col-4" name="btn" value="1">Вход</button>
-              <button class="btn btn-light btn-sm col-4" name="btn" value="0">Выход</button>
+              <button class="btn btn-primary btn-sm col-4" name="btn" value="1">Вход</button>
+              <button class="btn btn-danger btn-sm col-4" name="btn" value="0">Выход</button>
           </div>
         </form>
       </div>
@@ -20,26 +20,31 @@
 
 
     <!--Тут можно как-то улучшить внешний вид таблицы -->
-<div class="container">
-    <br>
-<p class="h3 text-center">Последние события:</p>
-    <table class="table">
-        <tr>
-            <th>Номер записи</th>
-            <th>Тип события</th>
-            <th>Номер пропуска</th>
-            <th>Время события</th>
-            <th>Время опоздания</th>
-        </tr>
-        {% for log in logs %}
-        <tr>
-            <td>{{ log.id_log }}</td>
-            <td>{{ log.inside_status }}</td>
-            <td>{{ log.pass_id }}</td>
-            <td>{{ log.log_time }}</td>
-            <td>{{ log.delay_time }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-</div>
+    <div class="container">
+        <br>
+    <p class="h3 text-center">Последние события:</p>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Номер записи</th>
+                    <th scope="col">Тип события</th>
+                    <th scope="col">Номер пропуска</th>
+                    <th scope="col">Время события</th>
+                    <th scope="col">Время опоздания</th>
+                </tr>
+            </thead>
+            {% for log in logs %}
+
+                <tr>
+                    <td class="col-1">{{ log.id_log }}</td>
+                    <td class="col-1">{{ log.inside_status }}</td>
+                    <td class="col-1">{{ log.pass_id }}</td>
+                    <td class="col-1">{{ log.log_time }}</td>
+                    <td class="col-1">{{ log.delay_time }}</td>
+                </tr>
+
+            {% endfor %}
+        </table>
+    </div>
+
 {% endblock %}

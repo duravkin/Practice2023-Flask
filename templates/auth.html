@@ -1,0 +1,42 @@
+{% extends "bases/base.html" %}
+{% block start %}
+
+    <div class="container">
+      <div class="d-flex justify-content-center mt-5">
+        <div>
+          <h5>Авторизация</h5>
+        </div>
+      </div>
+    </div>
+
+     <div class="container">
+      <div class="d-flex justify-content-center mt-2">
+        <div>
+          <!-- Тут сообщения о некорректном вводе появятся -->
+          {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class=flashes>
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+          {% endwith %}
+
+          <form action="{{ url_for('user_login') }}" method="POST">
+            <div class="mb-3">
+              <input type="text" class="form-control" placeholder="Логин" name="inputLogin">
+            </div>
+            <div class="mb-3">
+              <input type="password" class="form-control" placeholder="Пароль" name="inputPass">
+            </div>
+              <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary">Войти</button>
+              </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+
+{% endblock %}

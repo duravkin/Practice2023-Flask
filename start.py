@@ -165,7 +165,6 @@ class LogView(ModelView):
     column_labels = {'id_log': 'Log ID', 'inside_status': 'Inside Status', 'pass.person.surname': 'Surname', 'pass.person.firstname': 'First Name', 'log_time': 'Log Time', 'delay_time': 'Delay Time'}
 
 
-# После этого, замените добавление в админку для этих таблиц на новые классы представлений:
 admin.add_view(ModelView(Weekday, db.session))
 admin.add_view(ScheduleView(Schedule, db.session))
 admin.add_view(ModelView(Job, db.session))
@@ -199,39 +198,77 @@ def before_request():
     g.user = current_user
 
 
-@app.route("/login", methods=["POST"])
-async def user_login():
+@app.route("/auth")
+def auth_page():
+    return render_template("auth.html")
+
+
+@app.route("/auth/login", methods=["POST"])
+def user_login():
     if request.method == "POST":
         login = request.form["inputLogin"]
         password = request.form["inputPass"]
 
-        if login and password:
-            admin = Admin.query.filter_by(login=login).first()
-            if admin and check_password_hash(admin.password, password):
-                login_user(admin)
+        if login.strip() and password.strip():
+            now_admin = Admin.query.filter_by(login=login).first()
+            if now_admin and check_password_hash(now_admin.password, password):
+                login_user(now_admin)
                 return redirect(url_for("work_page"))
             else:
                 flash('Неправильный логин или пароль!')
         else:
             flash('Пожалуйста, заполните все поля!')
-    return redirect(url_for('start_page'))
+    return redirect(url_for('auth_page'))
 
 
-@app.route("/logout")
+@app.route("/auth/logout")
 @login_required
 def user_logout():
     logout_user()
     return redirect(url_for("start_page"))
 
 
-@app.route('/admin_page')
+@app.route('/my_admin')
+@login_required
 # @login_required
 def admin_page():
+    return render_template('my_admin.html')
+
+
+@app.route('/my_admin/change_password', methods=['GET', 'POST'])
+@login_required
+def admin_change_password():
+    if request.method == "POST":
+        now_admin = Admin.query.get(g.user.get_id())
+        old_pass = request.form['old_password'].strip()
+        new_1 = request.form['password1'].strip()
+        new_2 = request.form['password2'].strip()
+
+        if old_pass == '':
+            flash('Введите текущий пароль!')
+        elif not check_password_hash(now_admin.password, old_pass):
+            flash('Текущий пароль с ошибкой!')
+        elif new_1 == '' or new_2 == '':
+            flash('Введите новый пароль!')
+        elif new_1 != new_2:
+            flash('Поля с новым паролем не совпадают!')
+        else:
+            hash_pwd = generate_password_hash(new_1)
+            now_admin.password = hash_pwd
+            db.session.commit()
+            flash('Пароль обновлён!')
+
+    return redirect(url_for('admin_page'))
+
+
+@app.route('/my_admin/add')
+@login_required
+def reg_page():
     return render_template('add_admin.html')
 
 
-@app.route('/register', methods=['GET', 'POST'])
-# @login_required
+@app.route('/my_admin/add/register', methods=['GET', 'POST'])
+@login_required
 def register():
     if request.method == "POST":
         login = request.form['login']
@@ -243,7 +280,9 @@ def register():
         elif password.strip() == '' or password2.strip() == '':
             flash('Заполните поле "Пароль"!')
         elif password != password2:
-            flash('Пароль не совпадают!')
+            flash('Пароли не совпадают!')
+        elif Admin.query.filter_by(login=login).first():
+            flash('Логин уже существует!')
         else:
             hash_pwd = generate_password_hash(password)
             new_user = Admin()
@@ -251,10 +290,9 @@ def register():
             new_user.password = hash_pwd
             db.session.add(new_user)
             db.session.commit()
+            flash(f'Пользователь "{login}" успешно добавлен в систему!')
 
-            return redirect(url_for('start_page'))
-
-    return redirect(url_for('admin_page'))
+    return redirect(url_for('reg_page'))
 
 
 @app.route("/work")

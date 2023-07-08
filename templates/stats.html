@@ -2,51 +2,67 @@
 {% block start %}
 
     <div class="container">
-     <form class="row g-3" action="{{url_for('stats_page')}}" method="POST" >
-          <div class="col-auto">
-            <input type="text" class="form-control" name="id" placeholder="Номер удостоверения" value="{{ old if res }}">
+      <div class="d-flex justify-content-center mt-5">
+        <div class="text-left">
+          <div class="card" style="background-color: #545766; color: #fff; width: 30rem;">
+            <div class="card-body">
+             <form class="row g-3" action="{{url_for('stats_page')}}" method="POST" >
+                  <div class="d-flex justify-content-center">
+                    <input type="text" class="form-control" name="id" placeholder="Номер удостоверения" value="{{ old if res }}">
+                  </div>
+                  <div class="d-flex justify-content-center">
+                    <button type="submit" class="btn btn-primary mb-3">Проверить</button>
+                  </div>
+             </form>
+                 <div>
+              <!-- Тут сообщения о некорректном вводе появятся -->
+              {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                <ul class=flashes>
+                {% for message in messages %}
+                  <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+              {% endif %}
+            {% endwith %}
+                <div>
+                {% if res %}
+                    <div>
+                        <h4>{{ res.surname }} {{ res.firstname }} {{ res.patronymic }}</h4>
+                        <p>{{ res.job.job }} {{ res.group.group_name if res.group }}</p>
+                        <p>{{ res.passes[0].start_date }} - {{ res.passes[0].end_date }}</p>
+                    </div>
+                    {% if logs %}
+                </div>
+            </div>
+            </div>
           </div>
-          <div class="col-auto">
-            <button type="submit" class="btn btn-primary mb-3">Проверить</button>
-          </div>
-     </form>
-    <div>
-          <!-- Тут сообщения о некорректном вводе появятся -->
-          {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            <ul class=flashes>
-            {% for message in messages %}
-              <li>{{ message }}</li>
-            {% endfor %}
-            </ul>
-          {% endif %}
-        {% endwith %}
-    </div>
-    </div>
-    <div class="container">
-    {% if res %}
-        <div>
-            <h4>{{ res.surname }} {{ res.firstname }} {{ res.patronymic }}</h4>
-            <p>{{ res.job.job }} {{ res.group.group_name if res.group }}</p>
-            <p>{{ res.passes[0].start_date }} - {{ res.passes[0].end_date }}</p>
         </div>
-        {% if logs %}
+      </div>
+    </div>
+                        <br>
+    <div class="container">
+
             <table class="table">
-            <tr>
-                <th>Номер записи</th>
-                <th>Тип события</th>
-                <th>Номер пропуска</th>
-                <th>Время события</th>
-                <th>Время опоздания</th>
-            </tr>
+                <thead>
+                    <tr>
+                        <th scope="col">Номер записи</th>
+                        <th scope="col">Тип события</th>
+                        <th scope="col">Номер пропуска</th>
+                        <th scope="col">Время события</th>
+                        <th scope="col">Время опоздания</th>
+                    </tr>
+                </thead>
             {% for log in logs %}
-            <tr>
-                <td>{{ log.id_log }}</td>
-                <td>{{ log.inside_status }}</td>
-                <td>{{ log.pass_id }}</td>
-                <td>{{ log.log_time }}</td>
-                <td>{{ log.delay_time }}</td>
-            </tr>
+
+                    <tr>
+                        <td class="col-1">{{ log.id_log }}</td>
+                        <td class="col-1">{{ log.inside_status }}</td>
+                        <td class="col-1">{{ log.pass_id }}</td>
+                        <td class="col-1">{{ log.log_time }}</td>
+                        <td class="col-1">{{ log.delay_time }}</td>
+                    </tr>
+
             {% endfor %}
             </table>
         {% endif %}
