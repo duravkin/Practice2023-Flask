@@ -180,8 +180,12 @@ admin.add_view(ModelView(Log, db.session))
 
 @app.route("/", methods=["GET", "POST"])
 def start_page():
-    result = db.session.query(db.func.count(db.func.distinct(Pass.id_pass)).label('count_pass'),
-                              db.func.count(Log.id_log).label('count_logs')).join(Log).first()
+    query = text("SELECT (SELECT count(*) from passes) as pass_count, \
+                 (SELECT count(*) from logs) as logs_count, \
+                 (SELECT count(*) from logs where delay_time is not null) as delay_count, \
+                 (SELECT count(*) from logs where log_time::date = CURRENT_DATE) as today_logs_count, \
+                 (SELECT count(*) from logs where delay_time is not null and log_time::date = NOW()::date) as today_delay_count")
+    result = db.session.execute(query).fetchone()
 
     if request.method == "POST":
         id_pass = request.form["id"]

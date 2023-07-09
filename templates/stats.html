@@ -28,7 +28,7 @@
                 <div>
                 {% if res %}
                     <div>
-                        <h4>{{ res.surname }} {{ res.firstname }} {{ res.patronymic }}</h4>
+                        <h4>{{ res.surname }} {{ res.firstname }} {{ res.patronymic if res.patronymic }}</h4>
                         <p>{{ res.job.job }} {{ res.group.group_name if res.group }}</p>
                         <p>{{ res.passes[0].start_date }} - {{ res.passes[0].end_date }}</p>
                     </div>

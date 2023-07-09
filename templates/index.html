@@ -6,8 +6,11 @@
 
           <div class="card" style="background-color: #545766; color: #fff; width: 30rem;">
             <div class="card-body">
-              <p>Количество пропусков всего: {{ out.count_pass }}</p>
-              <p>Количество записей в журнале: {{ out.count_logs }}</p>
+              <p>Количество пропусков всего: {{ out.pass_count }}</p>
+              <p>Количество записей в журнале: {{ out.logs_count }}</p>
+              <p>Количество опозданий в журнале: {{ out.delay_count }}</p>
+              <p>Количество записей за сегодня: {{ out.today_logs_count }}</p>
+              <p>Количество опозданий за сегодня: {{ out.today_delay_count }}</p>
               <hr>
               <form class="row g-3" action="{{url_for('start_page')}}" method="POST" >
               <div class="col-auto">
