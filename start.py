@@ -306,7 +306,7 @@ def work_page():
 @app.route("/journal")
 @login_required
 def journal_page():
-    query = text("SELECT * FROM journal_view where weekday_id = (select extract(dow from NOW()::timestamp))")
+    query = text("SELECT * FROM journal_view where log_date = NOW()::date")
     result = db.session.execute(query)
     table_html = render_template('journal_table.html', jurnal=result)
     return render_template('journal.html', content=table_html)
@@ -316,7 +316,7 @@ def journal_page():
 async def journal_table_generate():
     if request.method == "GET":
         rb_day = request.args.get('rb_day')
-        query = text(f"SELECT * FROM journal_view where weekday_id = (select extract(dow from NOW()::timestamp) - {rb_day})")
+        query = text(f"SELECT * FROM journal_view where log_date = NOW()::date - '{rb_day} day'::interval")
         result = db.session.execute(query)
 
         table_html = render_template('journal_table.html', jurnal=result)
@@ -337,7 +337,7 @@ def new_log():
             db.session.add(log)
             db.session.commit()
         else:
-            pass  # https://habr.com/ru/companies/otus/articles/692820/
+            flash(f"Удостоверение №{id_pass} не существует")
         return redirect(url_for("work_page"))
 
 
@@ -372,6 +372,14 @@ def stats_page():
 @manager.user_loader
 def load_user(admin_id):
     return Admin.query.get(admin_id)
+
+
+@app.after_request
+def redirect_to_signin(response):
+    if response.status_code == 401:
+        return redirect(url_for('auth_page'))
+
+    return response
 
 
 if __name__ == "__main__":
