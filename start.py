@@ -343,7 +343,7 @@ def new_log():
             db.session.add(log)
             db.session.commit()
         else:
-            flash(f"Удостоверение №{id_pass} не существует")
+            flash(f"Удостоверение №{id_pass} не существует!")
         return redirect(url_for("work_page"))
 
 
