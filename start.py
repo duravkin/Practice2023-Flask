@@ -333,7 +333,9 @@ def new_log():
     if request.method == "POST":
         status = request.form["btn"]
         id_pass = request.form["id"]
-        if db.session.query(Pass.id_pass).filter(Pass.id_pass == id_pass).scalar() is not None:
+        if not id_pass.isdigit():
+            flash("Введите номер удостоверения!")
+        elif db.session.query(Pass.id_pass).filter(Pass.id_pass == id_pass).scalar() is not None:
             log = Log(
                 inside_status=bool(int(status)),
                 pass_id=id_pass
